@@ -9,7 +9,7 @@ class action_plugin_tzfix extends DokuWiki_Action_Plugin
         $controller->register_hook( 'DOKUWIKI_STARTED', 'BEFORE', $this, 
                 'tz_fix' );
     }
-
+/*
     private function plog($s)
     {
         $f = @fopen( '/hsphere/local/home/a957968/xxx.ato.su/log/tzfix.log', 'a' );
@@ -20,30 +20,29 @@ class action_plugin_tzfix extends DokuWiki_Action_Plugin
             fclose( $f );
         }
     }
-
+*/
     function tz_fix( $event, $data )
     {
       global $INPUT;
       $ip = $INPUT->server->str('REMOTE_ADDR');
       if( !$ip ) return;
-      if( intval($ip) == 127 || intval($ip) == 192 ) 
-      {
-        $ip = '213.180.204.213';
-      }
+      if( intval($ip) == 127 || intval($ip) == 192 ) return; 
+      //{
+      //  $ip = '213.180.204.213';
+      //}
 
       $key = preg_replace( '/\.\\d+$/', '', $ip );
       if( !$key ) return;
       $meta = p_get_metadata( 'plugin_tzfix', $key );
-//      $meta = false;
 
       if( $meta )
       {
         $meta = explode( ',', $meta );
         $tdiff = time()-$meta[1];
-        if( $tdiff > (60*60*24*30) )
-        // $this->getConf('tzfix_expires') )
+        $ttl = $this->getConf('tzfix_ttl');
+        if( $tdiff > (60*60*24* ($ttl ? $ttl : 30)) )
         {
-          $this->plog( "TZ for $key expired!" );
+          //$this->plog( "TZ for $key expired!" );
           $meta = false;
         }
       }
@@ -57,10 +56,9 @@ class action_plugin_tzfix extends DokuWiki_Action_Plugin
         if( !$json ) return;
 
         $meta = $json->region->timezone;
-        if( $meta == 'Europe/Moscow' ) $meta = 'Europe/Kaliningrad';
-
+        //if( $meta == 'Europe/Moscow' ) $meta = 'Europe/Kaliningrad';
         $meta = array( $meta, time() );
-        $this->plog( "new TZ for $key:\n".print_r( $meta, 1 ) );
+        //$this->plog( "new TZ for $key:\n".print_r( $meta, 1 ) );
         p_set_metadata( 'plugin_tzfix', array( $key => $meta[0].','.$meta[1] ) );
       }
       @date_default_timezone_set( $meta[0] );
