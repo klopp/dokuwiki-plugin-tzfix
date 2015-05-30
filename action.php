@@ -35,6 +35,10 @@ class action_plugin_tzfix extends DokuWiki_Action_Plugin
             if( !$json ) return;
             
             $meta = $json->region->timezone;
+             
+            // IX-hosting fix:
+            if( $meta == 'Europe/Moscow') $meta = 'Europe/Kaliningrad';
+            
             $meta = array($meta,time() 
             );
             p_set_metadata( 'plugin_tzfix', 

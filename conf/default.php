@@ -1,3 +1,3 @@
 <?php
 
-$conf['tzfix_ttl'] = 7;
+$conf['tzfix_ttl'] = 30;
